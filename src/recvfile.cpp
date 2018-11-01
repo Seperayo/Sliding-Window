@@ -198,10 +198,8 @@ void receive_file(){
 	            break;
 	        }
 	    }
-
 	    fwrite(buffer, 1, buffer_size, file);
 	}
-
 	fclose(file);
 }
 

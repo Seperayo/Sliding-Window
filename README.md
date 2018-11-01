@@ -1,7 +1,8 @@
 # :school: Tugas Besar Jaringan Komputer :school:  <!-- omit in toc -->
 
 # To do List <!-- omit in toc -->
-- [ ] **Refaktorisasi** dari main
+- [x] **Refaktorisasi** recvfile
+- [ ] **Refaktorisasi** sendfile
 - [ ] Implementasi **ACK** % **packet loss**
 - [ ] Implementasi **Checksum** corrupt data
 - [ ] Implementasi **delay** + **timeout**
@@ -9,7 +10,7 @@
 # :maple_leaf: Table of Content  <!-- omit in toc -->
 - [:busts_in_silhouette: Nama Anggota Kelompok](#busts_in_silhouette-nama-anggota-kelompok)
 - [:computer: Penjelasan Penggunaan Program](#computer-penjelasan-penggunaan-program)
-    - [Compiling Program](#compiling-program)
+	- [Compiling Program](#compiling-program)
 - [Penjelasan Sliding Window](#penjelasan-sliding-window)
 - [Penjelasan Fungsi-Fungsi](#penjelasan-fungsi-fungsi)
 - [Pembagian Tugas](#pembagian-tugas)
@@ -41,6 +42,17 @@ clean: recvfile sendfile
 
 ## Penjelasan Sliding Window
 ## Penjelasan Fungsi-Fungsi
+Berikut adalah fungsi-fungsi yang ada pada program kami
+1. `count_checksum(size_t data_length, char* data)`
+2. `read_packet(char* packet, unsigned int* seq_num, size_t* data_length, char* data, bool* is_check_sum_valid, bool* eot)`
+3. `create_ack(char *ack, unsigned int seq_num, bool is_check_sum_valid)`
+4. `read_argument(int argc, char *argv[])`
+5. `prepare_connection()`
+6. `receive_file()`
+7. `create_packet(char* packet, unsigned int seq_num, size_t data_length, char* data, bool eot)`
+8. `read_ack(char *ack, bool* is_nak, unsigned int *seq_num, bool *is_check_sum_valid)`
+9. `get_ack()`
+
 ## Pembagian Tugas
 | Nama Anggota        | Tugas |
 | ------------------- | ----- |
