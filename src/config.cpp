@@ -1,50 +1,6 @@
 //config.cpp
 #include "config.h"
 
-// Packet
-size_t create_packet(char* packet, unsigned int seq_num, size_t data_length, char* data, bool eot) {
-	// convert data into network type (big endian/little endian)
-	unsigned int network_seq_num = htonl(seq_num);
-	unsigned int network_data_length = htonl(data_length);
-
-	// copy data into frame
-	if (eot) {
-		packet[0] = 0x0;
-	} else {
-		packet[0] = 0x1;
-	}
-
-	memcpy(packet+1, &network_seq_num, 4);
-	memcpy(packet+5, &network_data_length, 4);
-	memcpy(packet+9, data, data_length);
-
-	packet[9 + data_length] = count_checksum(data_length, data);
-
-	return data_length + (size_t)10;
-}
-
-void read_packet(char* packet, unsigned int* seq_num, size_t* data_length, char* data, bool* is_check_sum_valid, bool* eot) {
-	// convert data
-	unsigned int network_seq_num;
-	unsigned int network_data_length;
-
-	// byte copy
-	memcpy(&network_seq_num, packet+1, 4);
-	memcpy(&network_data_length, packet+5, 4);
-
-	*seq_num = ntohl(network_seq_num);
-	*data_length = ntohl(network_data_length);
-
-	memcpy(data, packet+9, *data_length);
-
-	char sender_check_sum = packet[9 + *data_length];
-	char checksum = count_checksum(*data_length, data);
-
-	*is_check_sum_valid = sender_check_sum == checksum;
-
-	*eot = packet[0] == 0x0;
-}
-
 char count_checksum(size_t data_length, char* data) {
 	unsigned long sum = 0;
 	for (size_t i = 0; i < data_length; i++) {
@@ -55,31 +11,4 @@ char count_checksum(size_t data_length, char* data) {
 		}
 	}
 	return (char)(~(sum & 0xFF));
-}
-
-// ACK
-void create_ack(char *ack, unsigned int seq_num, bool is_check_sum_valid){
-	
-	if(is_check_sum_valid)
-		ack[0] = 0x0;
-	else
-		ack[0] = 0x1;
-
-	uint32_t net_seq_num = htonl(seq_num);
-	memcpy(ack + 1, &net_seq_num, 4);
-	ack[5] = count_checksum((size_t)4, (char *) &seq_num);
-}
-
-void read_ack(char *ack, bool* is_nak, unsigned int *seq_num, bool *is_check_sum_valid){
-	
-	if(ack[0] == 0x0)
-		*is_nak = false;
-	else
-		*is_nak = true;
-
-	uint32_t net_seq_num;
-	memcpy(&net_seq_num, ack + 1, 4);
-	*seq_num = ntohl(net_seq_num);
-
-	*is_check_sum_valid = ack[5] == count_checksum((size_t)4, (char *) seq_num);
 }

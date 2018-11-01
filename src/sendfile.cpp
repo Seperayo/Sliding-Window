@@ -1,13 +1,8 @@
 //sendfile.cpp
-#include <iostream>
-#include <sys/types.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#include <stdlib.h>
 #include <unistd.h>
-#include <string.h>
 #include <thread>
 #include <mutex>
 #include <stdio.h>
@@ -31,6 +26,41 @@ time_stamp *packet_send_time;
 time_stamp TMIN = current_time();
 mutex mt;
 
+size_t create_packet(char* packet, unsigned int seq_num, size_t data_length, char* data, bool eot) {
+    // convert data into network type (big endian/little endian)
+    unsigned int network_seq_num = htonl(seq_num);
+    unsigned int network_data_length = htonl(data_length);
+
+    // copy data into frame
+    if (eot) {
+        packet[0] = 0x0;
+    } else {
+        packet[0] = 0x1;
+    }
+
+    memcpy(packet+1, &network_seq_num, 4);
+    memcpy(packet+5, &network_data_length, 4);
+    memcpy(packet+9, data, data_length);
+
+    packet[9 + data_length] = count_checksum(data_length, data);
+
+    return data_length + (size_t)10;
+}
+
+void read_ack(char *ack, bool* is_nak, unsigned int *seq_num, bool *is_check_sum_valid){
+    
+    if(ack[0] == 0x0)
+        *is_nak = false;
+    else
+        *is_nak = true;
+
+    uint32_t net_seq_num;
+    memcpy(&net_seq_num, ack + 1, 4);
+    *seq_num = ntohl(net_seq_num);
+
+    *is_check_sum_valid = ack[5] == count_checksum((size_t)4, (char *) seq_num);
+}
+
 void get_ack() {
     char ack[ACK_LENGTH];
     unsigned int seq_num;
@@ -40,7 +70,7 @@ void get_ack() {
         int ack_size = recvfrom(sock, ack, ACK_LENGTH, MSG_WAITALL,(struct sockaddr *)&from, &sock_length);
         if (ack_size < 0) {
             cout << "Packet loss on receiving message" << endl;
-            exit(1);
+            exit(-1);
         }
 
         // Create ack from buffer
@@ -76,16 +106,16 @@ int main(int argc, char *argv[]) {
     // Initialize file related variables
     FILE *file;
     char *buffer;
-    char *filename;
+    char *file_name;
     unsigned int max_buffer_size, buffer_size;
 
     if (argc != 6) {
-    	cerr << "usage: ./sendfile <filename> <window_size> <buffer_size> <destination_ip> <destination_port>" << endl;
-    	exit(1);
+    	cerr << "usage: ./sendfile <file_name> <window_size> <buffer_size> <destination_ip> <destination_port>" << endl;
+    	exit(-1);
     }
 
     // Get data from argument
-    filename = argv[1];
+    file_name = argv[1];
     window_size = atoi(argv[2]);
     max_buffer_size = atoi(argv[3]) * (unsigned int) MAX_DATA_LENGTH;
     ip = argv[4];
@@ -95,7 +125,7 @@ int main(int argc, char *argv[]) {
     sock = socket(AF_INET, SOCK_DGRAM, 0);
     if (sock < 0) {
     	cerr << "ERROR on creating socket" << endl;
-    	exit(1);
+    	exit(-1);
     }
 
     // Get host name
@@ -103,7 +133,7 @@ int main(int argc, char *argv[]) {
     hp = gethostbyname(ip);
     if (hp == 0) {
     	cerr << "ERROR on getting host name" << endl;
-    	exit(1);
+    	exit(-1);
     }
 
     // Fill server data struct
@@ -112,11 +142,11 @@ int main(int argc, char *argv[]) {
     sock_length = sizeof(struct sockaddr_in);
 
     // Open file
-    if (access(filename, F_OK) < 0) {
+    if (access(file_name, F_OK) < 0) {
         cerr << "FILE not exist\n";
-        exit(1);
+        exit(-1);
     }
-    file = fopen(filename, "rb");
+    file = fopen(file_name, "rb");
     buffer = new char[max_buffer_size];
 
 
@@ -193,7 +223,7 @@ int main(int argc, char *argv[]) {
                         int n = sendto(sock, packet, packet_size, MSG_WAITALL, (const struct sockaddr *) &server, sock_length);
                         if (n < 0) {
                             cerr << "ERROR sending packet\n";
-                            exit(1);
+                            exit(-1);
                         }
 
                         has_packet_send[i] = true;
