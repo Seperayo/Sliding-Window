@@ -39,11 +39,10 @@ char *fileName;
 unsigned int maxBufferSize, bufferSize;
 
 size_t getPacketSize(char* packet, unsigned int sequenceNumber, size_t dataLength, char* data, bool isEOT) {
-    // convert data into network type (big endian/little endian)
+    
     unsigned int networkSequenceNumber = htonl(sequenceNumber);
     unsigned int networkDataLength = htonl(dataLength);
-
-    // copy data into frame
+    
     if (isEOT) {
         packet[0] = 0x0;
     } else {
@@ -81,7 +80,7 @@ void listenACK() {
     while(true) {
         int ACKSize = recvfrom(sock, ACK, ACK_LENGTH, MSG_WAITALL,(struct sockaddr *)&from, &sockLength);
         if (ACKSize < 0) {
-            cout << "Packet loss on receiving message" << endl;
+            cout << "Packet loss detected. Terminating..." << endl;
             exit(1);
         }
 
@@ -93,17 +92,17 @@ void listenACK() {
             if (sequenceNumber >= lastACKReceived + 1 && sequenceNumber <= lastFrameSent) {
                 if (!isNAK) {
                     hasACKReceived[sequenceNumber - (lastACKReceived + 1)] = true;
-                    cout << "Receiving ACK: " << sequenceNumber << endl;
+                    cout << "ACK " << sequenceNumber << " received." << endl;
                 } else {
                     packetSendTime[sequenceNumber - (lastACKReceived + 1)] = TMIN;
-                    cout << "Receiving NAK: " << sequenceNumber << endl;
+                    cout << "NAK " << sequenceNumber << " received." << endl;
                 }
             } else {
-                cout << "ACK out of bound " << sequenceNumber << endl;
+                cout << "ACK " << sequenceNumber << " out of bound." << endl;
             }
             mutexLock.unlock();
         } else {
-            cout << "ACK corrupt" << sequenceNumber << endl;
+            cout << "Corrupt ACK detected." << sequenceNumber << endl;
         }
     }
 }
@@ -114,7 +113,6 @@ void readArgument(int argc, char *argv[]) {
         exit(1);
     }
 
-    // Get data from argument
     fileName = argv[1];
     windowSize = atoi(argv[2]);
     maxBufferSize = atoi(argv[3]) * (unsigned int) MAX_DATA_LENGTH;
@@ -123,47 +121,41 @@ void readArgument(int argc, char *argv[]) {
 }
 
 void prepareConnection() {
-    // Create socket
     sock = socket(AF_INET, SOCK_DGRAM, 0);
     if (sock < 0) {
-    	cerr << "ERROR: creating socket" << endl;
+    	cerr << "Failed to create socket. Terminating..." << endl;
     	exit(1);
     }
-
-    // Get host name
+    
     server.sin_family = AF_INET;
     hostName = gethostbyname(ip);
     if (hostName == 0) {
-    	cerr << "ERROR: getting host name" << endl;
+    	cerr << "Failed to get hostname. Terminating..." << endl;
     	exit(1);
     }
-
-    // Fill server data struct
+    
     bcopy((char *)hostName->h_addr, (char *)&server.sin_addr, hostName->h_length);
     server.sin_port = htons(port);
     sockLength = sizeof(struct sockaddr);
-
-    // Open file
+    
     if (access(fileName, F_OK) < 0) {
-        cerr << "ERROR: File did not exist" << endl;
+        cerr << "File doesn't exist. Terminating..." << endl;
         exit(-1);
     }
+
     file = fopen(fileName, "rb");
     buffer = new char[maxBufferSize];
 }
 
 void sendFile() {
-    // Create a receiver thread
     thread listenACKThread(listenACK);
 
     bool isReadDone = false;
     while (!isReadDone) {
-
-        // Read file from buffer
+        
         bufferSize = fread(buffer, 1, maxBufferSize, file);
         isReadDone = maxBufferSize > bufferSize;
-
-        // Initialized sliding window variable
+        
         mutexLock.lock();
         hasACKReceived = new bool[windowSize];
         packetSendTime = new timeStamp[windowSize];
@@ -225,7 +217,7 @@ void sendFile() {
 
                         int n = sendto(sock, packet, packetSize, MSG_WAITALL, (const struct sockaddr *) &server, sockLength);
                         if (n < 0) {
-                            cerr << "ERROR sending packet\n";
+                            cerr << "Failed to send packet. Terminating...\n";
                             exit(1);
                         }
 
@@ -233,9 +225,9 @@ void sendFile() {
                         packetSendTime[i] = currentTime();
 
                         if (!isEOT) {
-                            cout << "Sending package " << sequenceNumber << endl;
+                            cout << "Packet " << sequenceNumber << " sent." << endl;
                         } else {
-                            cout << "Sending EOT package " << sequenceNumber << endl;
+                            cout << "EOT Packet " << sequenceNumber << " sent." << endl;
                         }
                     }
                 }
