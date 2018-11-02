@@ -14,7 +14,7 @@
 	- [:floppy_disk: recvfile](#floppy_disk-recvfile)
 	- [:floppy_disk: sendfile](#floppy_disk-sendfile)
 - [:hourglass_flowing_sand: Pembagian Tugas](#hourglass_flowing_sand-pembagian-tugas)
-- [:bookmark: About](#bookmark-about)
+- [:smiley: THANK YOU :smiley:](#smiley-thank-you-smiley)
 
 ## :busts_in_silhouette: Nama Anggota Kelompok
 :point_right: **Seperayo** -  **13516068**
@@ -138,4 +138,4 @@ Berikut adalah fungsi-fungsi yang ada pada program kami
 | 13516137 | [Hafizh Budiman](https://github.com/hafizhbudiman)  | getPacketSize, readACK, listenACK, sendFile                  |
 | 13516140 | [Ilham Firdaus Putra](https://github.com/Ilhamfp31) | receiveFile, readPacket, createACK                           |
 
-## :bookmark: About
+## :smiley: THANK YOU :smiley:
