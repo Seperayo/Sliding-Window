@@ -51,7 +51,6 @@ Berikut adalah fungsi-fungsi yang ada pada program kami
 2. `read_packet`
 ---
 3. `create_ack`
----
 
 ### recvfile
 1. `read_argument (recvfile)`
@@ -59,28 +58,32 @@ Berikut adalah fungsi-fungsi yang ada pada program kami
 2. `prepare_connection (recvfile)`
 ---
 3. `receive_file`
----
 
 ### sendfile
 
-* get_packet_size
+1. get_packet_size
+
 ⋅⋅⋅Fungsi ini untuk menghitung ukuran dari packet yang akan dikirim.
 ---
-* read_ack
+2. read_ack
+
 ⋅⋅⋅Fungsi untuk membaca ack yang diterima oleh pengirim, apakah dia sebuah NAK atau tidak, serta melakukan penghitungan checksum terhadap ACK yang diterima.
 ---
-* get_ack
+3. get_ack
+
 ⋅⋅⋅Fungsi ini digunakan oleh sender untuk menerima ACK dan NAK. Fungsi ini dijalankan pada thread yang berbeda dengan thread untuk mengirim file, agar sender dapat mengirim packet dan menerima ACK/NAK ⋅⋅⋅secara bersamaan.
 ---
-* read_argument (sendfile)
+4. read_argument (sendfile)
+
 ⋅⋅⋅Fungsi ini bertugas untuk melakukan parsing terhadap parameter input user.
 ---
-* prepare_connection (sendfile)
+5. prepare_connection (sendfile)
+
 ⋅⋅⋅Fungsi ini digunakan untuk mempersiapkan socket, hostname, dan mempersiapkan file yang akan dikirimkan.
 ---
-* send_file
+6. send_file
+
 ⋅⋅⋅Fungsi ini digunakan untuk mengirimkan packet. Mutex lock diimplementasikan pada fungsi ini untuk menjaga sinkronisasi dari kedua thread.
----
 
 ## Pembagian Tugas
 | Nama Anggota        | Tugas |
