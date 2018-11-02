@@ -95,14 +95,20 @@ Prosess pengiriman ini akan berlangsung dengan batas window size dari masukan us
 Berikut adalah fungsi-fungsi yang ada pada program kami
 
 ### config
-1. `count_checksum`
-2. `read_packet`
-3. `create_ack`
+1. count_checksum
+	+ Fungsi ini untuk menghitung nilai checksum dari data yang dikirim. 
 
 ### recvfile
-1. `read_argument (recvfile)`
-2. `prepare_connection (recvfile)`
-3. `receive_file`
+1. read_argument (recvfile)
+	+ Fungsi ini
+2. prepare_connection (recvfile)
+	+ Fungsi ini
+3. receive_file
+	+ Fungsi ini
+4. read_packet
+	+ Fungsi ini 
+5. create_ack
+	+ Fungsi ini  
 
 ### sendfile
 
