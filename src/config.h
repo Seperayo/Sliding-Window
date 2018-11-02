@@ -13,6 +13,7 @@ using namespace std;
 #define TIMEOUT 10
 #define MAX_DATA_LENGTH 1024
 #define MAX_PACKET_LENGTH 1034
+#define ACK_TIME 5000
 #define ACK_LENGTH 6
 #define current_time chrono::high_resolution_clock::now
 #define time_stamp chrono::high_resolution_clock::time_point
