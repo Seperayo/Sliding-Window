@@ -130,22 +130,23 @@ void receive_file(){
 	        // Get packet
 	        read_packet(packet, &seq_num, &data_length, data, &is_check_sum_valid, &eot);
 
-	        if (seq_num <= laf) {
-	            // Create ack
-	            create_ack(ack, seq_num, is_check_sum_valid);
 
-	            // Send ack
-	            int ack_size = sendto(sock, ack, ACK_LENGTH, MSG_WAITALL, (struct sockaddr *)&from, fromlen);
-	            // if (rand()%10 == 1)
-	            // {
-	            //     cout << "\n\nLOSS\n\nLOSS\n\n";
-	            //     ack_size = -1;
-	            // } else {
-	            //     ack_size = sendto(sock, ack, ACK_LENGTH, MSG_WAITALL, (struct sockaddr *)&from, fromlen);
-	            // }
-	            if (ack_size < 0) {
-	                cout << "Fail sending ack\n";
-	            } else if (is_check_sum_valid) {
+	        // Create ack
+	        create_ack(ack, seq_num, is_check_sum_valid);
+	        // Send ack
+	        int ack_size = sendto(sock, ack, ACK_LENGTH, MSG_WAITALL, (struct sockaddr *)&from, fromlen);
+	        // if (rand()%10 == 1)
+	        // {
+	        //     cout << "\n\nLOSS\n\nLOSS\n\n";
+	        //     ack_size = -1;
+	        // } else {
+	        //     ack_size = sendto(sock, ack, ACK_LENGTH, MSG_WAITALL, (struct sockaddr *)&from, fromlen);
+	        // }
+	        if (ack_size < 0) {
+	            cout << "Fail sending ack\n";
+	        }
+	        if (seq_num <= laf) {
+	            if (is_check_sum_valid) {
 	                int buffer_shift = seq_num * MAX_DATA_LENGTH;
 
 	                if (seq_num == lfr + 1) {
@@ -171,7 +172,6 @@ void receive_file(){
 	                    if (!packet_received[seq_num - (lfr + 1)]) {
 	                        memcpy(buffer + buffer_shift, data, data_length);
 	                        packet_received[seq_num - (lfr + 1)] = true;
-
 	                    }
 	                }
 
@@ -191,6 +191,7 @@ void receive_file(){
 	            }
 	        } else {
 	            // Send negative ack
+	            cout << "lfr : " << lfr << " laf : " << laf << "\n";
 	            cout << "SeqNum out of range : " << seq_num << endl;
 	        }
 
@@ -200,7 +201,29 @@ void receive_file(){
 	    }
 	    fwrite(buffer, 1, buffer_size, file);
 	}
-	fclose(file);
+	
+	time_stamp start_time = current_time();
+    while (elapsed_time(current_time(), start_time) < ACK_TIME) {
+        int packet_size = recvfrom(sock, packet, MAX_PACKET_LENGTH, MSG_WAITALL, (struct sockaddr *)&from, &fromlen);
+        if (packet_size < 0) {
+            cout << "Error on receiving message\n";
+            // exit(1);
+        }
+
+        // Get packet
+        read_packet(packet, &seq_num, &data_length, data, &is_check_sum_valid, &eot);
+
+        // Create ack
+        create_ack(ack, seq_num, is_check_sum_valid);
+
+        // Send ack
+        int ack_size = sendto(sock, ack, ACK_LENGTH, MSG_WAITALL, (struct sockaddr *)&from, fromlen);
+        if (ack_size < 0) {
+            cout << "Fail sending ack\n";
+        }
+    }
+
+    fclose(file);
 }
 
 int main(int argc, char *argv[]) {
