@@ -1,8 +1,6 @@
 # :school: Tugas Besar Jaringan Komputer :school:  <!-- omit in toc -->
 
 # To Do List <!-- omit in toc -->
-- [ ] Penentuan besar Timeout
-- [ ] Penerapam Pumba
 - [ ] Penjelasan Fungsi
 
 # :maple_leaf: Table of Content  <!-- omit in toc -->
@@ -29,7 +27,7 @@
 :point_right: **Ilham Firdausi Putra** - **13516140**
 
 ## :speech_balloon: Deskripsi Tugas
-Program yang akan dibuat terdiri dari dua file , yaitu sender dan receiver . Implementasi diwajibkan menggunakan bahasa C/C++ dengan protokol UDP. Program sender akan membaca suatu file dan mengirimnya ke receiver dengan menggunakan Sliding Window Protocol . Program receiver akan menerima data yang dikirim dan menuliskan file tersebut ke file system .
+Program yang akan dibuat terdiri dari dua file , yaitu sender dan receiver. Implementasi diwajibkan menggunakan bahasa C/C++ dengan protokol UDP. Program sender akan membaca suatu file dan mengirimnya ke receiver dengan menggunakan Sliding Window Protocol. Program receiver akan menerima data yang dikirim dan menuliskan file tersebut ke file system.
 
 ## :computer: Penjelasan Program
 ### Compiling Program
@@ -86,8 +84,8 @@ Selain itu, **Protokol Selective Repeat** juga memerlukan hal berikut:
 Pada saat awal eksekusi program akan menggunakan socket dalam menginisiasi komunikasi antara sender dan receiver. Setelah itu, sender akan memasukkan data file ke dalam buffer yang dibentuk dalam satuan frame dengan memperhitungkan checksum-nya juga beserta komponen lain ,yaitu:
 ![](image/frame.jpg)
 
-Setelah frame itu dikirim ke receiver, receiver akan menerima melalui socket dan melakukan pemeriksaan menggunakan metode checksum. Apabila ditemukan error, receiver akan mengirim NAK ke sender untuk meminta packet tersebut dikirim ulang. Jika kondisi packet baik-baik saja, akan dikirimkan ACK oleh receiver ke sender. Sender juga akan mengirimkan kembali packet secara otomatis jika ACK tak kunjung diterima hingga timeout habis **(Timeout pada program kami sebesar = )**. Data dari packet akan disimpan dalam buffer sampai pengiriman selesai (menerima eot - *end of transmission*) sebelum dituliskan ke *file system* di receiver. Bentuk ACK yang dikirim oleh receiver:
-![](image/ACK.jpg)
+Setelah frame itu dikirim ke receiver, receiver akan menerima melalui socket dan melakukan pemeriksaan menggunakan metode checksum. Apabila ditemukan error, receiver akan mengirim NAK ke sender untuk meminta packet tersebut dikirim ulang. Jika kondisi packet baik-baik saja, akan dikirimkan ACK oleh receiver ke sender. Sender juga akan mengirimkan kembali packet secara otomatis jika ACK tak kunjung diterima hingga timeout habis **(Timeout pada program kami sebesar = 10 ms)**. Data dari packet akan disimpan dalam buffer sampai pengiriman selesai (menerima eot - *end of transmission*) sebelum dituliskan ke *file system* di receiver. Bentuk ACK yang dikirim oleh receiver:
+![](image/ack.jpg)
 
 Prosess pengiriman ini akan berlangsung dengan batas window size dari masukan user yang akan terus bergeser hingga frame terakhir seiring seluruh packet dari sender berhasil menerima ACK dari receiver.
 
@@ -135,10 +133,10 @@ Berikut adalah fungsi-fungsi yang ada pada program kami
 	+ Fungsi ini digunakan untuk mengirimkan packet. Mutex lock diimplementasikan pada fungsi ini untuk menjaga sinkronisasi dari kedua thread.
 
 ## :hourglass: Pembagian Tugas
-| Nama Anggota        | Tugas |
-| ------------------- | ----- |
-| Seperayo            |       |
-| Ilham Firdaus Putra |       |
-| Hafizh Budiman      |       |
+| NIM      | Nama Anggota        | Tugas |
+| -------- | ------------------- | ----- |
+| 13516068 | Seperayo            |       |
+| 13516137 | Hafizh Budiman      |       |
+| 13516140 | Ilham Firdaus Putra |       |
 
 ## :bookmark: About
