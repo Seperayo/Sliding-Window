@@ -160,7 +160,7 @@ void receiveFile(){
 	                    for (unsigned int i = 0; i < windowSize - shift; i++) {
 	                        isPacketReceived[i] = isPacketReceived[i + shift];
 	                    }
-	                    	
+
 	                    for (unsigned int i = windowSize - shift; i < windowSize; i++) {
 	                        isPacketReceived[i] = false;
 	                    }
@@ -177,7 +177,6 @@ void receiveFile(){
 	                    bufferSize = buffer_shift + dataLength;
 	                    sequenceCount = sequenceNumber + 1;
 	                    isReceiveDone = true;
-	                    cout << lastFrameReceived << endl;
 	                    cout << "Receive packet eot " << sequenceNumber << endl;
 	                    cout << "Sending ACK eot " << sequenceNumber << endl;
 	                } else {
@@ -189,7 +188,6 @@ void receiveFile(){
 	                cout << "Sending NAK : " << sequenceNumber << endl;
 	            }
 	        } else {
-	            // Send negative ACK
 	            cout << "lastFrameReceived : " << lastFrameReceived << " lastACKReceived : " << lastACKReceived << "\n";
 	            cout << "SeqNum out of range : " << sequenceNumber << endl;
 	        }
