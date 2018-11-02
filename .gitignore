@@ -1,3 +1,6 @@
 *.txt
-recvfile
-sendfile
+!*.md
+!*.pdf
+!Makefile
+!Dockerfile
+!*.sh
