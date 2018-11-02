@@ -1,8 +1,5 @@
 # :school: [IF3130] Tugas Besar Jaringan Komputer :school:  <!-- omit in toc -->
 
-# To Do List <!-- omit in toc -->
-- [ ] Pembagian Tugas
-
 # :maple_leaf: Table of Content  <!-- omit in toc -->
 - [:busts_in_silhouette: Nama Anggota Kelompok](#busts_in_silhouette-nama-anggota-kelompok)
 - [:speech_balloon: Deskripsi Tugas](#speech_balloon-deskripsi-tugas)
@@ -99,10 +96,10 @@ Berikut adalah fungsi-fungsi yang ada pada program kami
 	+ Fungsi untuk menghitung nilai checksum dari data yang dikirim. 
 
 ### :floppy_disk: recvfile
-1. readArgument
+1. readArgument (recvfile)
 	+ Fungsi untuk melakukan parsing terhadap parameter input user.
 
-2. prepareConnection
+2. prepareConnection (recvfile)
 	+ Fungsi untuk mempersiapkan koneksi dengan melakukan binding pada port server.
 
 3. receiveFile
@@ -135,10 +132,10 @@ Berikut adalah fungsi-fungsi yang ada pada program kami
 	+ Fungsi untuk mengirimkan packet. Mutex lock diimplementasikan pada fungsi ini untuk menjaga sinkronisasi dari kedua thread.
 
 ## :hourglass_flowing_sand: Pembagian Tugas
-| NIM      | Nama Anggota        | Tugas |
-| -------- | ------------------- | ----- |
-| 13516068 | Seperayo            |       |
-| 13516137 | Hafizh Budiman      |       |
-| 13516140 | Ilham Firdaus Putra |       |
+| NIM      | Nama Anggota                                        | Tugas                                                        |
+| -------- | --------------------------------------------------- | ------------------------------------------------------------ |
+| 13516068 | [Seperayo](https://github.com/Seperayo)             | countChecksum, readArgument (both), prepareConnection (both) |
+| 13516137 | [Hafizh Budiman](https://github.com/hafizhbudiman)  | getPacketSize, readACK, listenACK, sendFile                  |
+| 13516140 | [Ilham Firdaus Putra](https://github.com/Ilhamfp31) | receiveFile, readPacket, createACK                           |
 
 ## :bookmark: About

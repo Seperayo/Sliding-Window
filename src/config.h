@@ -20,7 +20,6 @@ using namespace std;
 #define elapsedTime(end, start) chrono::duration_cast<chrono::milliseconds>(end - start).count()
 char countChecksum(size_t dataLength, char* data);
 
-
 #endif
 
 
