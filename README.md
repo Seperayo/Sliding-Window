@@ -27,7 +27,7 @@
 :point_right: **Ilham Firdausi Putra** - **13516140**
 
 ## :speech_balloon: Deskripsi Tugas
-Program yang akan dibuat terdiri dari dua file , yaitu sender dan receiver . Implementasi diwajibkan menggunakan bahasa C/C++ dengan protokol UDP. Program sender akan membaca suatu file dan mengirimnya ke receiver dengan menggunakan Sliding Window Protocol . Program receiver akan menerima data yang dikirim dan menuliskan file tersebut ke file system .
+Program yang akan dibuat terdiri dari dua file , yaitu sender dan receiver. Implementasi diwajibkan menggunakan bahasa C/C++ dengan protokol UDP. Program sender akan membaca suatu file dan mengirimnya ke receiver dengan menggunakan Sliding Window Protocol. Program receiver akan menerima data yang dikirim dan menuliskan file tersebut ke file system.
 
 ## :computer: Penjelasan Program
 ### Compiling Program
@@ -98,7 +98,7 @@ Berikut adalah fungsi-fungsi yang ada pada program kami
 
 ### recvfile
 1. read_argument (recvfile)
-	+ Fungsi ini
+	+ Fungsi ini 
 2. prepare_connection (recvfile)
 	+ Fungsi ini
 3. receive_file
@@ -106,7 +106,7 @@ Berikut adalah fungsi-fungsi yang ada pada program kami
 4. read_packet
 	+ Fungsi ini 
 5. create_ack
-	+ Fungsi ini  
+	+ Fungsi ini 
 
 ### sendfile
 
@@ -129,10 +129,10 @@ Berikut adalah fungsi-fungsi yang ada pada program kami
 	+ Fungsi ini digunakan untuk mengirimkan packet. Mutex lock diimplementasikan pada fungsi ini untuk menjaga sinkronisasi dari kedua thread.
 
 ## :hourglass: Pembagian Tugas
-| Nama Anggota        | Tugas |
-| ------------------- | ----- |
-| Seperayo            |       |
-| Ilham Firdaus Putra |       |
-| Hafizh Budiman      |       |
+| NIM      | Nama Anggota        | Tugas |
+| -------- | ------------------- | ----- |
+| 13516068 | Seperayo            |       |
+| 13516137 | Hafizh Budiman      |       |
+| 13516140 | Ilham Firdaus Putra |       |
 
 ## :bookmark: About
