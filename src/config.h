@@ -15,10 +15,10 @@ using namespace std;
 #define MAX_PACKET_LENGTH 1034
 #define ACK_TIME 5000
 #define ACK_LENGTH 6
-#define current_time chrono::high_resolution_clock::now
-#define time_stamp chrono::high_resolution_clock::time_point
-#define elapsed_time(end, start) chrono::duration_cast<chrono::milliseconds>(end - start).count()
-char count_checksum(size_t dataLength, char* data);
+#define currentTime chrono::high_resolution_clock::now
+#define timeStamp chrono::high_resolution_clock::time_point
+#define elapsedTime(end, start) chrono::duration_cast<chrono::milliseconds>(end - start).count()
+char countChecksum(size_t dataLength, char* data);
 
 
 #endif

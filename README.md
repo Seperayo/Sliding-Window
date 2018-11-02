@@ -93,7 +93,7 @@ Prosess pengiriman ini akan berlangsung dengan batas window size dari masukan us
 Berikut adalah fungsi-fungsi yang ada pada program kami
 
 ### config
-1. count_checksum
+1. countChecksum
 	+ Fungsi untuk menghitung nilai checksum dari data yang dikirim. 
 
 ### recvfile

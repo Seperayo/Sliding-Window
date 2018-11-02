@@ -10,7 +10,7 @@
 using namespace std;
 
 // Initialize socket variables
-int sock, socket_length, windowSize;
+int sock, socketLength, windowSize;
 unsigned int port;
 socklen_t fromlen;
 struct sockaddr_in server, from;
@@ -45,10 +45,10 @@ void readPacket(char* packet, unsigned int* sequenceNumber, size_t* dataLength, 
 
 	memcpy(data, packet+9, *dataLength);
 
-	char sender_check_sum = packet[9 + *dataLength];
-	char checksum = count_checksum(*dataLength, data);
+	char senderChecksum = packet[9 + *dataLength];
+	char checksum = countChecksum(*dataLength, data);
 
-	*isChecksumValid = sender_check_sum == checksum;
+	*isChecksumValid = senderChecksum == checksum;
 
 	*eot = packet[0] == 0x0;
 }
@@ -62,7 +62,7 @@ void createACK(char *ACK, unsigned int sequenceNumber, bool isChecksumValid){
 
 	uint32_t networkSequenceNumber = htonl(sequenceNumber);
 	memcpy(ACK + 1, &networkSequenceNumber, 4);
-	ACK[5] = count_checksum((size_t)4, (char *) &sequenceNumber);
+	ACK[5] = countChecksum((size_t)4, (char *) &sequenceNumber);
 }
 
 void readArgument(int argc, char *argv[]){
@@ -85,15 +85,15 @@ void prepareConnection(){
     }
 
     // Assign server port and address
-    socket_length = sizeof(server);
-    bzero(&server, socket_length);
+    socketLength = sizeof(server);
+    bzero(&server, socketLength);
 
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
     server.sin_port = htons(port);
 
     // Bind socket
-    if (bind(sock, (struct sockaddr *) &server, socket_length) < 0) {
+    if (bind(sock, (struct sockaddr *) &server, socketLength) < 0) {
         cerr << "ERROR: Can't bind to address" << endl;
         exit(-1);
     }
@@ -145,10 +145,10 @@ void receiveFile(){
 	        }
 	        if (sequenceNumber <= largestAcceptableFrame) {
 	            if (isChecksumValid) {
-	                int buffer_shift = sequenceNumber * MAX_DATA_LENGTH;
+	                int bufferShift = sequenceNumber * MAX_DATA_LENGTH;
 
 	                if (sequenceNumber == lastFrameReceived + 1) {
-	                    memcpy(buffer + buffer_shift, data, dataLength);
+	                    memcpy(buffer + bufferShift, data, dataLength);
 	                    unsigned int shift = 1;
 	                    for (unsigned int i = 1; i < windowSize; i++) {
 	                        if (!isPacketReceived[i]) {
@@ -168,13 +168,13 @@ void receiveFile(){
 	                    largestAcceptableFrame = lastFrameReceived + windowSize;
 	                } else if (sequenceNumber > lastFrameReceived + 1) {
 	                    if (!isPacketReceived[sequenceNumber - (lastFrameReceived + 1)]) {
-	                        memcpy(buffer + buffer_shift, data, dataLength);
+	                        memcpy(buffer + bufferShift, data, dataLength);
 	                        isPacketReceived[sequenceNumber - (lastFrameReceived + 1)] = true;
 	                    }
 	                }
 
 	                if (eot) {
-	                    bufferSize = buffer_shift + dataLength;
+	                    bufferSize = bufferShift + dataLength;
 	                    sequenceCount = sequenceNumber + 1;
 	                    isReceiveDone = true;
 	                    cout << "Receive packet eot " << sequenceNumber << endl;

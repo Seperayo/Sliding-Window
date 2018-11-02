@@ -21,9 +21,9 @@ char *ip;
 int lastACKReceived, lastFrameSent;
 bool *hasACKReceived;
 bool *hasPacketSend;
-time_stamp *packetSendTime;
+timeStamp *packetSendTime;
 
-time_stamp TMIN = current_time();
+timeStamp TMIN = currentTime();
 mutex mutexLock;
 
 // Packet variables
@@ -54,7 +54,7 @@ size_t getPacketSize(char* packet, unsigned int sequenceNumber, size_t dataLengt
     memcpy(packet+5, &networkDataLength, 4);
     memcpy(packet+9, data, dataLength);
 
-    packet[9 + dataLength] = count_checksum(dataLength, data);
+    packet[9 + dataLength] = countChecksum(dataLength, data);
 
     return dataLength + (size_t)10;
 }
@@ -70,7 +70,7 @@ void readACK(char *ACK, bool* isNAK, unsigned int *sequenceNumber, bool *isCheck
     memcpy(&networkSequenceNumber, ACK + 1, 4);
     *sequenceNumber = ntohl(networkSequenceNumber);
 
-    *isChecksumValid = ACK[5] == count_checksum((size_t)4, (char *) sequenceNumber);
+    *isChecksumValid = ACK[5] == countChecksum((size_t)4, (char *) sequenceNumber);
 }
 
 void listenACK() {
@@ -166,7 +166,7 @@ void sendFile() {
         // Initialized sliding window variable
         mutexLock.lock();
         hasACKReceived = new bool[windowSize];
-        packetSendTime = new time_stamp[windowSize];
+        packetSendTime = new timeStamp[windowSize];
         bool hasPacketSend[windowSize];
         int sequenceCount = bufferSize / MAX_DATA_LENGTH;
         if (bufferSize % MAX_DATA_LENGTH) {
@@ -215,10 +215,10 @@ void sendFile() {
                 sequenceNumber = lastACKReceived + i + 1;
 
                 if (sequenceNumber < sequenceCount) {
-                    if (!hasPacketSend[i] || ((!hasACKReceived[i]) && (elapsed_time(current_time(), packetSendTime[i]) > TIMEOUT))) {
-                        unsigned int buffer_shift = sequenceNumber * MAX_DATA_LENGTH;
-                        dataSize = (bufferSize - buffer_shift < MAX_DATA_LENGTH) ? (bufferSize - buffer_shift) : MAX_DATA_LENGTH;
-                        memcpy(data, buffer + buffer_shift, dataSize);
+                    if (!hasPacketSend[i] || ((!hasACKReceived[i]) && (elapsedTime(currentTime(), packetSendTime[i]) > TIMEOUT))) {
+                        unsigned int bufferShift = sequenceNumber * MAX_DATA_LENGTH;
+                        dataSize = (bufferSize - bufferShift < MAX_DATA_LENGTH) ? (bufferSize - bufferShift) : MAX_DATA_LENGTH;
+                        memcpy(data, buffer + bufferShift, dataSize);
 
                         bool eot = (sequenceNumber == sequenceCount - 1) && (isReadDone);
                         packetSize = getPacketSize(packet, sequenceNumber, dataSize, data, eot);
@@ -230,7 +230,7 @@ void sendFile() {
                         }
 
                         hasPacketSend[i] = true;
-                        packetSendTime[i] = current_time();
+                        packetSendTime[i] = currentTime();
 
                         if (!eot) {
                             cout << "Sending package " << sequenceNumber << endl;
