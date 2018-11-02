@@ -43,15 +43,18 @@ clean: recvfile sendfile
 ## Penjelasan Sliding Window
 ## Penjelasan Fungsi-Fungsi
 Berikut adalah fungsi-fungsi yang ada pada program kami
-1. `count_checksum(size_t data_length, char* data)`
-2. `read_packet(char* packet, unsigned int* seq_num, size_t* data_length, char* data, bool* is_check_sum_valid, bool* eot)`
-3. `create_ack(char *ack, unsigned int seq_num, bool is_check_sum_valid)`
-4. `read_argument(int argc, char *argv[])`
-5. `prepare_connection()`
-6. `receive_file()`
-7. `create_packet(char* packet, unsigned int seq_num, size_t data_length, char* data, bool eot)`
-8. `read_ack(char *ack, bool* is_nak, unsigned int *seq_num, bool *is_check_sum_valid)`
-9. `get_ack()`
+1. `count_checksum`
+2. `read_packet`
+3. `create_ack`
+4. `read_argument (recvfile)`
+5. `prepare_connection (recvfile)`
+6. `receive_file`
+7. `get_packet_size` Fungsi ini untuk menghitung ukuran dari packet yang akan dikirim.
+8. `read_ack` Fungsi untuk membaca ack yang diterima oleh pengirim, apakah dia sebuah NAK atau tidak, serta melakukan penghitungan checksum terhadap ACK yang diterima.
+9. `get_ack` Fungsi ini digunakan oleh sender untuk menerima ACK dan NAK. Fungsi ini dijalankan pada thread yang berbeda dengan thread untuk mengirim file, agar sender dapat mengirim packet dan menerima ACK/NAK secara bersamaan.
+10. `read_argument (sendfile)` Fungsi ini bertugas untuk melakukan parsing terhadap parameter input user.
+10. `prepare_connection (sendfile)` Fungsi ini digunakan untuk mempersiapkan socket, hostname, dan mempersiapkan file yang akan dikirimkan.
+10. `send_file` Fungsi ini digunakan untuk mengirimkan packet. Mutex lock diimplementasikan pada fungsi ini untuk menjaga sinkronisasi dari kedua thread.
 
 ## Pembagian Tugas
 | Nama Anggota        | Tugas |

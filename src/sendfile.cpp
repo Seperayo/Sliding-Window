@@ -38,7 +38,7 @@ char *buffer;
 char *file_name;
 unsigned int max_buffer_size, buffer_size;
 
-size_t create_packet(char* packet, unsigned int seq_num, size_t data_length, char* data, bool eot) {
+size_t get_packet_size(char* packet, unsigned int seq_num, size_t data_length, char* data, bool eot) {
     // convert data into network type (big endian/little endian)
     unsigned int network_seq_num = htonl(seq_num);
     unsigned int network_data_length = htonl(data_length);
@@ -221,7 +221,7 @@ void send_file() {
                         memcpy(data, buffer + buffer_shift, data_size);
 
                         bool eot = (seq_num == seq_count - 1) && (read_done);
-                        packet_size = create_packet(packet, seq_num, data_size, data, eot);
+                        packet_size = get_packet_size(packet, seq_num, data_size, data, eot);
 
                         int n = sendto(sock, packet, packet_size, MSG_WAITALL, (const struct sockaddr *) &server, sock_length);
                         if (n < 0) {
