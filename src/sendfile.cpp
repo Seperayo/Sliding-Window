@@ -154,7 +154,7 @@ void prepareConnection() {
 
 void sendFile() {
     // Create a receiver thread
-    thread receiver_thread(listenACK);
+    thread listenACKThread(listenACK);
 
     bool isReadDone = false;
     while (!isReadDone) {
@@ -254,7 +254,7 @@ void sendFile() {
     fclose(file);
     delete[] packetSendTime;
     delete[] hasACKReceived;
-    receiver_thread.detach();
+    listenACKThread.detach();
 }
 
 int main(int argc, char *argv[]) {
