@@ -18,7 +18,7 @@ using namespace std;
 #define current_time chrono::high_resolution_clock::now
 #define time_stamp chrono::high_resolution_clock::time_point
 #define elapsed_time(end, start) chrono::duration_cast<chrono::milliseconds>(end - start).count()
-char count_checksum(size_t data_length, char* data);
+char count_checksum(size_t dataLength, char* data);
 
 
 #endif

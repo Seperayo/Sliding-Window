@@ -51,7 +51,7 @@ clean: recvfile sendfile
 ### Penggunaan Program
 1. Setelah berhasil dicompile gunakan command berikut untuk memulai pengiriman file
 ```
-   ./sendfile <filename> <windowsize> <buffersize> <destination_ip> <destination_port>
+   ./sendfile <filename> <windowsize> <buffersize> <destinationIP> <destinationPort>
 ```
 2. Command berikut digunakan untuk menerima file
 ```
@@ -87,7 +87,7 @@ Pada saat awal eksekusi program akan menggunakan socket dalam menginisiasi komun
 ![](image/frame.jpg)
 
 Setelah frame itu dikirim ke receiver, receiver akan menerima melalui socket dan melakukan pemeriksaan menggunakan metode checksum. Apabila ditemukan error, receiver akan mengirim NAK ke sender untuk meminta packet tersebut dikirim ulang. Jika kondisi packet baik-baik saja, akan dikirimkan ACK oleh receiver ke sender. Sender juga akan mengirimkan kembali packet secara otomatis jika ACK tak kunjung diterima hingga timeout habis **(Timeout pada program kami sebesar = )**. Data dari packet akan disimpan dalam buffer sampai pengiriman selesai (menerima eot - *end of transmission*) sebelum dituliskan ke *file system* di receiver. Bentuk ACK yang dikirim oleh receiver:
-![](image/ack.jpg)
+![](image/ACK.jpg)
 
 Prosess pengiriman ini akan berlangsung dengan batas window size dari masukan user yang akan terus bergeser hingga frame terakhir seiring seluruh packet dari sender berhasil menerima ACK dari receiver.
 
@@ -99,35 +99,39 @@ Berikut adalah fungsi-fungsi yang ada pada program kami
 	+ Fungsi ini untuk menghitung nilai checksum dari data yang dikirim. 
 
 ### recvfile
-1. read_argument (recvfile)
+1. readArgument (recvfile)
 	+ Fungsi ini
-2. prepare_connection (recvfile)
+
+2. prepareConnection (recvfile)
 	+ Fungsi ini
-3. receive_file
+
+3. receiveFile
 	+ Fungsi ini
-4. read_packet
+
+4. readPacket
 	+ Fungsi ini 
-5. create_ack
+	
+5. createACK
 	+ Fungsi ini  
 
 ### sendfile
 
-1. get_packet_size
+1. getPacketSize
 	+ Fungsi ini untuk menghitung ukuran dari packet yang akan dikirim.
 
-2. read_ack
-	+ Fungsi untuk membaca ack yang diterima oleh pengirim, apakah dia sebuah NAK atau tidak, serta melakukan penghitungan checksum terhadap ACK yang diterima.
+2. readACK
+	+ Fungsi untuk membaca ACK yang diterima oleh pengirim, apakah dia sebuah NAK atau tidak, serta melakukan penghitungan checksum terhadap ACK yang diterima.
 
-3. get_ack
+3. listenACK
 	+ Fungsi ini digunakan oleh sender untuk menerima ACK dan NAK. Fungsi ini dijalankan pada thread yang berbeda dengan thread untuk mengirim file, agar sender dapat mengirim packet dan menerima ACK/NAK ⋅⋅⋅secara bersamaan.
 
-4. read_argument (sendfile)
+4. readArgument (sendfile)
 	+ Fungsi ini bertugas untuk melakukan parsing terhadap parameter input user.
 
-5. prepare_connection (sendfile)
+5. prepareConnection (sendfile)
 	+ Fungsi ini digunakan untuk mempersiapkan socket, hostname, dan mempersiapkan file yang akan dikirimkan.
 
-6. send_file
+6. sendFile
 	+ Fungsi ini digunakan untuk mengirimkan packet. Mutex lock diimplementasikan pada fungsi ini untuk menjaga sinkronisasi dari kedua thread.
 
 ## :hourglass: Pembagian Tugas
