@@ -82,7 +82,7 @@ void get_ack() {
         int ack_size = recvfrom(sock, ack, ACK_LENGTH, MSG_WAITALL,(struct sockaddr *)&from, &sock_length);
         if (ack_size < 0) {
             cout << "Packet loss on receiving message" << endl;
-            exit(-1);
+            exit(1);
         }
 
         // Create ack from buffer
@@ -111,7 +111,7 @@ void get_ack() {
 void read_argument(int argc, char *argv[]) {
     if (argc != 6) {
         cerr << "usage: ./sendfile <file_name> <window_size> <buffer_size> <destination_ip> <destination_port>" << endl;
-        exit(-1);
+        exit(1);
     }
 
     // Get data from argument
@@ -127,7 +127,7 @@ void prepare_connection() {
     sock = socket(AF_INET, SOCK_DGRAM, 0);
     if (sock < 0) {
     	cerr << "ERROR on creating socket" << endl;
-    	exit(-1);
+    	exit(1);
     }
 
     // Get host name
@@ -135,7 +135,7 @@ void prepare_connection() {
     hp = gethostbyname(ip);
     if (hp == 0) {
     	cerr << "ERROR on getting host name" << endl;
-    	exit(-1);
+    	exit(1);
     }
 
     // Fill server data struct
@@ -154,6 +154,7 @@ void prepare_connection() {
 
 void send_file() {
     // Create a receiver thread
+    int progress = 0;
     thread receiver_thread(get_ack);
 
     bool read_done = false;
@@ -226,7 +227,7 @@ void send_file() {
                         int n = sendto(sock, packet, packet_size, MSG_WAITALL, (const struct sockaddr *) &server, sock_length);
                         if (n < 0) {
                             cerr << "ERROR sending packet\n";
-                            exit(-1);
+                            exit(1);
                         }
 
                         has_packet_send[i] = true;
@@ -244,17 +245,20 @@ void send_file() {
             if (lar >= seq_count - 1) {
                 send_done = true;
             }
+            progress++;
         }
         cout << "is read done ? " << read_done << "\n";
         if (read_done) {
             break;
         }
+        
     }
 
     fclose(file);
     delete[] packet_send_time;
     delete[] has_ack_received;
     receiver_thread.detach();
+    cout << "iteration: " << progress << endl;
 }
 
 int main(int argc, char *argv[]) {
