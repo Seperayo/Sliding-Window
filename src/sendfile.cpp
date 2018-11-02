@@ -154,7 +154,6 @@ void prepare_connection() {
 
 void send_file() {
     // Create a receiver thread
-    int progress = 0;
     thread receiver_thread(get_ack);
 
     bool read_done = false;
@@ -245,9 +244,7 @@ void send_file() {
             if (lar >= seq_count - 1) {
                 send_done = true;
             }
-            progress++;
         }
-        cout << "is read done ? " << read_done << "\n";
         if (read_done) {
             break;
         }
@@ -258,7 +255,6 @@ void send_file() {
     delete[] packet_send_time;
     delete[] has_ack_received;
     receiver_thread.detach();
-    cout << "iteration: " << progress << endl;
 }
 
 int main(int argc, char *argv[]) {
