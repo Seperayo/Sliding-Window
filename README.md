@@ -94,43 +94,43 @@ Berikut adalah fungsi-fungsi yang ada pada program kami
 
 ### config
 1. count_checksum
-	+ Fungsi ini untuk menghitung nilai checksum dari data yang dikirim. 
+	+ Fungsi untuk menghitung nilai checksum dari data yang dikirim. 
 
 ### recvfile
-1. readArgument (recvfile)
-	+ Fungsi ini
+1. readArgument
+	+ Fungsi untuk melakukan parsing terhadap parameter input user.
 
-2. prepareConnection (recvfile)
-	+ Fungsi ini
+2. prepareConnection
+	+ Fungsi untuk mempersiapkan koneksi dengan melakukan binding pada port server.
 
 3. receiveFile
-	+ Fungsi ini
+	+ Fungsi untuk menerima packet dari server.
 
 4. readPacket
-	+ Fungsi ini 
+	+ Fungsi untuk membaca packet dari server.
 	
 5. createACK
-	+ Fungsi ini  
+	+ Fungsi untuk membuat ACK/NAK.
 
 ### sendfile
 
 1. getPacketSize
-	+ Fungsi ini untuk menghitung ukuran dari packet yang akan dikirim.
+	+ Fungsi untuk menghitung ukuran dari packet yang akan dikirim.
 
 2. readACK
 	+ Fungsi untuk membaca ACK yang diterima oleh pengirim, apakah dia sebuah NAK atau tidak, serta melakukan penghitungan checksum terhadap ACK yang diterima.
 
 3. listenACK
-	+ Fungsi ini digunakan oleh sender untuk menerima ACK dan NAK. Fungsi ini dijalankan pada thread yang berbeda dengan thread untuk mengirim file, agar sender dapat mengirim packet dan menerima ACK/NAK ⋅⋅⋅secara bersamaan.
+	+ Fungsi untuk menerima ACK dan NAK. Fungsi ini dijalankan pada thread yang berbeda dengan thread untuk mengirim file, agar sender dapat mengirim packet dan menerima ACK/NAK ⋅⋅⋅secara bersamaan.
 
 4. readArgument (sendfile)
-	+ Fungsi ini bertugas untuk melakukan parsing terhadap parameter input user.
+	+ Fungsi untuk melakukan parsing terhadap parameter input user.
 
 5. prepareConnection (sendfile)
-	+ Fungsi ini digunakan untuk mempersiapkan socket, hostname, dan mempersiapkan file yang akan dikirimkan.
+	+ Fungsi untuk mempersiapkan socket, hostname, dan mempersiapkan file yang akan dikirimkan.
 
 6. sendFile
-	+ Fungsi ini digunakan untuk mengirimkan packet. Mutex lock diimplementasikan pada fungsi ini untuk menjaga sinkronisasi dari kedua thread.
+	+ Fungsi untuk mengirimkan packet. Mutex lock diimplementasikan pada fungsi ini untuk menjaga sinkronisasi dari kedua thread.
 
 ## :hourglass: Pembagian Tugas
 | NIM      | Nama Anggota        | Tugas |

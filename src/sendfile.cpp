@@ -18,13 +18,13 @@ struct sockaddr_in server, from;
 struct hostent *hostName;
 char *ip;
 
-int lar, lfs;
+int lastACKReceived, lastFrameSent;
 bool *hasACKReceived;
 bool *hasPacketSend;
 time_stamp *packetSendTime;
 
 time_stamp TMIN = current_time();
-mutex mt;
+mutex mutexLock;
 
 // Packet variables
 unsigned int sequenceNumber;
@@ -89,19 +89,19 @@ void listenACK() {
         readACK(ACK, &isNAK, &sequenceNumber, &isChecksumValid);
 
         if (isChecksumValid) {
-            mt.lock();
-            if (sequenceNumber >= lar + 1 && sequenceNumber <= lfs) {
+            mutexLock.lock();
+            if (sequenceNumber >= lastACKReceived + 1 && sequenceNumber <= lastFrameSent) {
                 if (!isNAK) {
-                    hasACKReceived[sequenceNumber - (lar + 1)] = true;
+                    hasACKReceived[sequenceNumber - (lastACKReceived + 1)] = true;
                     cout << "Receiving ACK: " << sequenceNumber << endl;
                 } else {
-                    packetSendTime[sequenceNumber - (lar + 1)] = TMIN;
+                    packetSendTime[sequenceNumber - (lastACKReceived + 1)] = TMIN;
                     cout << "Receiving NAK: " << sequenceNumber << endl;
                 }
             } else {
                 cout << "ACK out of bound " << sequenceNumber << endl;
             }
-            mt.unlock();
+            mutexLock.unlock();
         } else {
             cout << "ACK corrupt" << sequenceNumber << endl;
         }
@@ -156,15 +156,15 @@ void sendFile() {
     // Create a receiver thread
     thread receiver_thread(listenACK);
 
-    bool read_done = false;
-    while (!read_done) {
+    bool isReadDone = false;
+    while (!isReadDone) {
 
         // Read file from buffer
         bufferSize = fread(buffer, 1, maxBufferSize, file);
-        read_done = maxBufferSize > bufferSize;
+        isReadDone = maxBufferSize > bufferSize;
 
         // Initialized sliding window variable
-        mt.lock();
+        mutexLock.lock();
         hasACKReceived = new bool[windowSize];
         packetSendTime = new time_stamp[windowSize];
         bool hasPacketSend[windowSize];
@@ -178,13 +178,13 @@ void sendFile() {
             hasACKReceived[i] = false;
         }
 
-        lar = -1;
-        lfs = lar + windowSize;
-        mt.unlock();
+        lastACKReceived = -1;
+        lastFrameSent = lastACKReceived + windowSize;
+        mutexLock.unlock();
 
-        bool send_done = false;
-        while (!send_done) {
-            mt.lock();
+        bool isSendDone = false;
+        while (!isSendDone) {
+            mutexLock.lock();
             if (hasACKReceived[0]) {
                 unsigned int shift = 1;
 
@@ -206,13 +206,13 @@ void sendFile() {
                     hasACKReceived[i] = false;
                 }
 
-                lar += shift;
-                lfs = lar + windowSize;
+                lastACKReceived += shift;
+                lastFrameSent = lastACKReceived + windowSize;
             }
-            mt.unlock();
+            mutexLock.unlock();
 
             for (unsigned int i = 0; i < windowSize; i ++) {
-                sequenceNumber = lar + i + 1;
+                sequenceNumber = lastACKReceived + i + 1;
 
                 if (sequenceNumber < sequenceCount) {
                     if (!hasPacketSend[i] || ((!hasACKReceived[i]) && (elapsed_time(current_time(), packetSendTime[i]) > TIMEOUT))) {
@@ -220,7 +220,7 @@ void sendFile() {
                         dataSize = (bufferSize - buffer_shift < MAX_DATA_LENGTH) ? (bufferSize - buffer_shift) : MAX_DATA_LENGTH;
                         memcpy(data, buffer + buffer_shift, dataSize);
 
-                        bool eot = (sequenceNumber == sequenceCount - 1) && (read_done);
+                        bool eot = (sequenceNumber == sequenceCount - 1) && (isReadDone);
                         packetSize = getPacketSize(packet, sequenceNumber, dataSize, data, eot);
 
                         int n = sendto(sock, packet, packetSize, MSG_WAITALL, (const struct sockaddr *) &server, sockLength);
@@ -241,11 +241,11 @@ void sendFile() {
                 }
             }
 
-            if (lar >= sequenceCount - 1) {
-                send_done = true;
+            if (lastACKReceived >= sequenceCount - 1) {
+                isSendDone = true;
             }
         }
-        if (read_done) {
+        if (isReadDone) {
             break;
         }
         

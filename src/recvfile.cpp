@@ -16,7 +16,7 @@ socklen_t fromlen;
 struct sockaddr_in server, from;
 
 // Initialize sliding window variables
-int lastACKReceived, lastFrameReceived;
+int largestAcceptableFrame, lastFrameReceived;
 int bufferSize, maxBufferSize;
 char *buffer;
 char *fileName;
@@ -115,7 +115,7 @@ void receiveFile(){
 	    }
 
 	    lastFrameReceived = -1;
-	    lastACKReceived = lastFrameReceived + windowSize;
+	    largestAcceptableFrame = lastFrameReceived + windowSize;
 
 	    fromlen = sizeof(struct sockaddr_in);
 	    while (true) {
@@ -143,7 +143,7 @@ void receiveFile(){
 	        if (ACKSize < 0) {
 	            cout << "Fail sending ACK\n";
 	        }
-	        if (sequenceNumber <= lastACKReceived) {
+	        if (sequenceNumber <= largestAcceptableFrame) {
 	            if (isChecksumValid) {
 	                int buffer_shift = sequenceNumber * MAX_DATA_LENGTH;
 
@@ -165,7 +165,7 @@ void receiveFile(){
 	                        isPacketReceived[i] = false;
 	                    }
 	                    lastFrameReceived += shift;
-	                    lastACKReceived = lastFrameReceived + windowSize;
+	                    largestAcceptableFrame = lastFrameReceived + windowSize;
 	                } else if (sequenceNumber > lastFrameReceived + 1) {
 	                    if (!isPacketReceived[sequenceNumber - (lastFrameReceived + 1)]) {
 	                        memcpy(buffer + buffer_shift, data, dataLength);
@@ -188,7 +188,7 @@ void receiveFile(){
 	                cout << "Sending NAK : " << sequenceNumber << endl;
 	            }
 	        } else {
-	            cout << "lastFrameReceived : " << lastFrameReceived << " lastACKReceived : " << lastACKReceived << "\n";
+	            cout << "lastFrameReceived : " << lastFrameReceived << " largestAcceptableFrame : " << largestAcceptableFrame << "\n";
 	            cout << "SeqNum out of range : " << sequenceNumber << endl;
 	        }
 
