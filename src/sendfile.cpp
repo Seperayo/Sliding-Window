@@ -11,7 +11,7 @@
 
 using namespace std;
 
-// global variable
+// Initialize global variables
 int sock, window_size;
 unsigned int sock_length, port;
 struct sockaddr_in server, from;
@@ -25,6 +25,18 @@ time_stamp *packet_send_time;
 
 time_stamp TMIN = current_time();
 mutex mt;
+
+// Packet variables
+unsigned int seq_num;
+unsigned int packet_size, data_size;
+char data[MAX_DATA_LENGTH];
+char packet[MAX_PACKET_LENGTH];
+
+// File variables
+FILE *file;
+char *buffer;
+char *file_name;
+unsigned int max_buffer_size, buffer_size;
 
 size_t create_packet(char* packet, unsigned int seq_num, size_t data_length, char* data, bool eot) {
     // convert data into network type (big endian/little endian)
@@ -96,22 +108,10 @@ void get_ack() {
     }
 }
 
-int main(int argc, char *argv[]) {
-    // Initialize packet related variables
-    unsigned int seq_num;
-    unsigned int packet_size, data_size;
-    char data[MAX_DATA_LENGTH];
-    char packet[MAX_PACKET_LENGTH];
-
-    // Initialize file related variables
-    FILE *file;
-    char *buffer;
-    char *file_name;
-    unsigned int max_buffer_size, buffer_size;
-
+void read_argument(int argc, char *argv[]) {
     if (argc != 6) {
-    	cerr << "usage: ./sendfile <file_name> <window_size> <buffer_size> <destination_ip> <destination_port>" << endl;
-    	exit(-1);
+        cerr << "usage: ./sendfile <file_name> <window_size> <buffer_size> <destination_ip> <destination_port>" << endl;
+        exit(-1);
     }
 
     // Get data from argument
@@ -120,7 +120,9 @@ int main(int argc, char *argv[]) {
     max_buffer_size = atoi(argv[3]) * (unsigned int) MAX_DATA_LENGTH;
     ip = argv[4];
     port = atoi(argv[5]);
+}
 
+void prepare_connection() {
     // Create socket
     sock = socket(AF_INET, SOCK_DGRAM, 0);
     if (sock < 0) {
@@ -148,8 +150,9 @@ int main(int argc, char *argv[]) {
     }
     file = fopen(file_name, "rb");
     buffer = new char[max_buffer_size];
+}
 
-
+void send_file() {
     // Create a receiver thread
     thread receiver_thread(get_ack);
 
@@ -252,6 +255,11 @@ int main(int argc, char *argv[]) {
     delete[] packet_send_time;
     delete[] has_ack_received;
     receiver_thread.detach();
+}
 
+int main(int argc, char *argv[]) {
+    read_argument(argc, argv);
+    prepare_connection();
+    send_file();
 	return 0;
 }
