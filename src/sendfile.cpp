@@ -38,13 +38,13 @@ char *buffer;
 char *fileName;
 unsigned int maxBufferSize, bufferSize;
 
-size_t getPacketSize(char* packet, unsigned int sequenceNumber, size_t dataLength, char* data, bool eot) {
+size_t getPacketSize(char* packet, unsigned int sequenceNumber, size_t dataLength, char* data, bool isEOT) {
     // convert data into network type (big endian/little endian)
     unsigned int networkSequenceNumber = htonl(sequenceNumber);
     unsigned int networkDataLength = htonl(dataLength);
 
     // copy data into frame
-    if (eot) {
+    if (isEOT) {
         packet[0] = 0x0;
     } else {
         packet[0] = 0x1;
@@ -220,8 +220,8 @@ void sendFile() {
                         dataSize = (bufferSize - bufferShift < MAX_DATA_LENGTH) ? (bufferSize - bufferShift) : MAX_DATA_LENGTH;
                         memcpy(data, buffer + bufferShift, dataSize);
 
-                        bool eot = (sequenceNumber == sequenceCount - 1) && (isReadDone);
-                        packetSize = getPacketSize(packet, sequenceNumber, dataSize, data, eot);
+                        bool isEOT = (sequenceNumber == sequenceCount - 1) && (isReadDone);
+                        packetSize = getPacketSize(packet, sequenceNumber, dataSize, data, isEOT);
 
                         int n = sendto(sock, packet, packetSize, MSG_WAITALL, (const struct sockaddr *) &server, sockLength);
                         if (n < 0) {
@@ -232,10 +232,10 @@ void sendFile() {
                         hasPacketSend[i] = true;
                         packetSendTime[i] = currentTime();
 
-                        if (!eot) {
+                        if (!isEOT) {
                             cout << "Sending package " << sequenceNumber << endl;
                         } else {
-                            cout << "Sending eot package " << sequenceNumber << endl;
+                            cout << "Sending EOT package " << sequenceNumber << endl;
                         }
                     }
                 }

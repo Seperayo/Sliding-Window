@@ -21,7 +21,7 @@ int bufferSize, maxBufferSize;
 char *buffer;
 char *fileName;
 FILE *file;
-bool eot;
+bool isEOT;
 
 // Initialize packet variables
 unsigned int sequenceNumber;
@@ -31,7 +31,7 @@ char ACK[ACK_LENGTH];
 char packet[MAX_PACKET_LENGTH];
 char data[MAX_DATA_LENGTH];
 
-void readPacket(char* packet, unsigned int* sequenceNumber, size_t* dataLength, char* data, bool* isChecksumValid, bool* eot) {
+void readPacket(char* packet, unsigned int* sequenceNumber, size_t* dataLength, char* data, bool* isChecksumValid, bool* isEOT) {
 	// convert data
 	unsigned int networkSequenceNumber;
 	unsigned int networkDataLength;
@@ -50,7 +50,7 @@ void readPacket(char* packet, unsigned int* sequenceNumber, size_t* dataLength, 
 
 	*isChecksumValid = senderChecksum == checksum;
 
-	*eot = packet[0] == 0x0;
+	*isEOT = packet[0] == 0x0;
 }
 
 void createACK(char *ACK, unsigned int sequenceNumber, bool isChecksumValid){
@@ -127,12 +127,14 @@ void receiveFile(){
 	        }
 
 	        // Get packet
-	        readPacket(packet, &sequenceNumber, &dataLength, data, &isChecksumValid, &eot);
+	        readPacket(packet, &sequenceNumber, &dataLength, data, &isChecksumValid, &isEOT);
 
 	        // Create ACK
 	        createACK(ACK, sequenceNumber, isChecksumValid);
+
 	        // Send ACK
 	        int ACKSize = sendto(sock, ACK, ACK_LENGTH, MSG_WAITALL, (struct sockaddr *)&from, fromlen);
+	        // int ACKSize;
 	        // if (rand()%10 == 1)
 	        // {
 	        //     cout << "\n\nLOSS\n\nLOSS\n\n";
@@ -173,12 +175,12 @@ void receiveFile(){
 	                    }
 	                }
 
-	                if (eot) {
+	                if (isEOT) {
 	                    bufferSize = bufferShift + dataLength;
 	                    sequenceCount = sequenceNumber + 1;
 	                    isReceiveDone = true;
-	                    cout << "Receive packet eot " << sequenceNumber << endl;
-	                    cout << "Sending ACK eot " << sequenceNumber << endl;
+	                    cout << "Receive packet EOT " << sequenceNumber << endl;
+	                    cout << "Sending ACK EOT " << sequenceNumber << endl;
 	                } else {
 	                    cout << "Receive packet  " << sequenceNumber << endl;
 	                    cout << "Sending ACK  " << sequenceNumber << endl;
